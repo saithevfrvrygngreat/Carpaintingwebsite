@@ -5,7 +5,7 @@ import AuthContext from '../context/AuthContext';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
-import { LayoutDashboard, Users, ShoppingBag, Settings, LogOut, Search, Filter, Mail, User, DollarSign, Activity, Calendar, CheckCircle, Clock, XCircle, MoreVertical, Edit2, Play, Wrench, Star, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Users, ShoppingBag, Settings, LogOut, Search, Filter, Mail, User, DollarSign, Activity, Calendar, CheckCircle, Clock, XCircle, MoreVertical, Edit2, Play, Wrench, Star, MessageSquare, Loader } from 'lucide-react';
 import API_URL from '../config';
 import { motion, AnimatePresence } from 'framer-motion';
 
