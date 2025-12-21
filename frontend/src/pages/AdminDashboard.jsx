@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AuthContext from '../context/AuthContext';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
@@ -8,12 +10,23 @@ import API_URL from '../config';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminDashboard = () => {
+    const { user, loading: authLoading } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     // Removed stats state to derive from bookings directly
     const [bookings, setBookings] = useState([]);
     const [users, setUsers] = useState([]);
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
+
+    useEffect(() => {
+        if (!authLoading) {
+            if (!user || user.role !== 'admin') {
+                navigate('/login');
+            }
+        }
+    }, [user, authLoading, navigate]);
     const [statusUpdating, setStatusUpdating] = useState(null);
     const [sortOption, setSortOption] = useState('date'); // 'date' | 'status'
 
