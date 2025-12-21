@@ -9,14 +9,17 @@ const path = require('path');
 
 // Multer Config for Avatar
 // Multer Config for Avatar
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../uploads/'));
-    },
-    filename: function (req, file, cb) {
-        cb(null, 'AVATAR-' + Date.now() + path.extname(file.originalname));
-    }
-});
+// Multer Config for Avatar
+const storage = process.env.NODE_ENV === 'production'
+    ? multer.memoryStorage()
+    : multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, path.join(__dirname, '../uploads/'));
+        },
+        filename: function (req, file, cb) {
+            cb(null, 'AVATAR-' + Date.now() + path.extname(file.originalname));
+        }
+    });
 
 const upload = multer({
     storage: storage,
