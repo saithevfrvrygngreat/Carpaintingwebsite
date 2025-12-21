@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, MapPin, Wrench, AlertCircle, CheckCircle, Trash2, XCircle, Star, Car } from 'lucide-react';
+import { Calendar, Clock, MapPin, Wrench, AlertCircle, CheckCircle, Trash2, XCircle, Star, Car, Loader } from 'lucide-react';
 import API_URL from '../config';
 import { toast } from 'react-hot-toast';
 
