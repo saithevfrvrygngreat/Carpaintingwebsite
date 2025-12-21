@@ -13,13 +13,16 @@ router.get('/ping', (req, res) => res.send('pong'));
 // Get all service prices or filter by car type
 router.get('/prices', async (req, res) => {
     try {
+        console.log("Fetching prices for:", req.query);
         const { carType } = req.query;
         let query = {};
         if (carType) query.carType = carType;
         const prices = await ServicePrice.find(query);
+        console.log(`Found ${prices.length} prices`);
         res.json(prices);
     } catch (err) {
-        res.status(500).send('Server Error');
+        console.error("Price Fetch Error:", err);
+        res.status(500).json({ error: 'Server Error', details: err.message });
     }
 });
 
