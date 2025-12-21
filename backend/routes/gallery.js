@@ -6,12 +6,15 @@ const Gallery = require('../models/Gallery');
 const auth = require('../middleware/auth');
 
 // Multer Config
-const storage = multer.diskStorage({
-    destination: './uploads/',
-    filename: function (req, file, cb) {
-        cb(null, 'IMAGE-' + Date.now() + path.extname(file.originalname));
-    }
-});
+// Multer Config
+const storage = process.env.NODE_ENV === 'production'
+    ? multer.memoryStorage()
+    : multer.diskStorage({
+        destination: './uploads/',
+        filename: function (req, file, cb) {
+            cb(null, 'IMAGE-' + Date.now() + path.extname(file.originalname));
+        }
+    });
 
 const upload = multer({
     storage: storage,

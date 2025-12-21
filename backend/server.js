@@ -37,18 +37,25 @@ const path = require('path');
 const fs = require('fs');
 
 // Ensure uploads directory exists
-// Ensure uploads directory exists (Try-catch for Vercel read-only FS)
+// Serve Uploads - Only if directory exists
 const uploadDir = path.join(__dirname, 'uploads');
 try {
     if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir);
+        // Only try to make directory if NOT in production (Vercel)
+        if (process.env.NODE_ENV !== 'production') {
+            fs.mkdirSync(uploadDir);
+        }
     }
 } catch (err) {
-    console.log("Warning: Could not create uploads directory (likely read-only fs on Vercel). Image uploads will fail.");
+    console.log("Warning: Could not create uploads directory (expected on Vercel).");
 }
 
-// Serve Uploads
-app.use('/uploads', express.static(uploadDir));
+if (fs.existsSync(uploadDir)) {
+    app.use('/uploads', express.static(uploadDir));
+} else {
+    // Mock the uploads route so it doesn't 404 entire app
+    app.use('/uploads', (req, res) => res.status(404).send('Image storage not available on Vercel ephemeral file system'));
+}
 
 app.get('/', (req, res) => {
     res.send('Car Painting Service API Running');
