@@ -188,7 +188,7 @@ const UserMenu = ({ user, logout }) => {
             <button className="flex items-center gap-3 pl-2 pr-4 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group">
                 <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-primary/50">
                     {user.profileImage ? (
-                        <img src={`http://localhost:5000${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+                        <img src={`${API_URL}${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                         <span className="text-primary font-bold text-sm">{user.name.charAt(0).toUpperCase()}</span>
                     )}
