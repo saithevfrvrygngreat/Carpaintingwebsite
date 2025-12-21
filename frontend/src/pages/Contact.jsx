@@ -2,7 +2,6 @@ import { MapPin, Phone, Mail, Send, Clock, XCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import axios from 'axios';
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 import API_URL from '../config';
 import { toast, Toaster } from 'react-hot-toast';
 
