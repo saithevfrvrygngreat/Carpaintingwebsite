@@ -9,7 +9,11 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: ["https://carpaintingwebsite-m4t6.vercel.app", "http://localhost:5173", "http://localhost:5000", "https://car-painting-website-liard.vercel.app"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
 
 // DEBUG: Request Logger
 app.use((req, res, next) => {
