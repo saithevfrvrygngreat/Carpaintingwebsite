@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, MapPin, Wrench, AlertCircle, CheckCircle, Trash2, XCircle, Star, Car, Loader } from 'lucide-react';
+import { Calendar, Clock, MapPin, Wrench, AlertCircle, CheckCircle, Trash2, XCircle, Star, Car } from 'lucide-react';
 import API_URL from '../config';
 import { toast } from 'react-hot-toast';
 
@@ -251,7 +251,7 @@ const MyBookings = () => {
                                                     'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
                                             }`}>
                                             {booking.status === 'Completed' ? <CheckCircle size={14} /> :
-                                                booking.status === 'In Progress' ? <Loader size={14} className="animate-spin" /> :
+                                                booking.status === 'In Progress' ? <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div> :
                                                     booking.status === 'Cancelled' ? <XCircle size={14} /> :
                                                         <Clock size={14} />}
                                             {booking.status}
