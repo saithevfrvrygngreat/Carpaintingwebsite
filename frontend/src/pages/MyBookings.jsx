@@ -44,7 +44,7 @@ const MyBookings = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) return;
-            const res = await axios.get(`${API_URL}/api/bookings/my`, {
+            const res = await axios.get(`${API_URL}/api/my-bookings`, {
                 headers: { 'x-auth-token': token }
             });
             // Sort by latest created (or pickup date if createdAt missing)
@@ -71,7 +71,7 @@ const MyBookings = () => {
         const loadingToast = toast.loading('Sending OTP...');
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post(`http://localhost:5000/api/bookings/${otpModal.bookingId}/request-cancel-otp`, {}, {
+            const res = await axios.post(`${API_URL}/api/bookings/${otpModal.bookingId}/request-cancel-otp`, {}, {
                 headers: { 'x-auth-token': token }
             });
 
@@ -113,7 +113,7 @@ const MyBookings = () => {
         const loadingToast = toast.loading('Verifying & Cancelling...');
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/bookings/${otpModal.bookingId}/cancel`, {
+            await axios.put(`${API_URL}/api/bookings/${otpModal.bookingId}/cancel`, {
                 otp: otpModal.otp
             }, {
                 headers: { 'x-auth-token': token }
@@ -134,7 +134,7 @@ const MyBookings = () => {
     const handleFeedback = async (id, rating, comment) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`http://localhost:5000/api/bookings/${id}/feedback`, { rating, comment }, {
+            await axios.post(`${API_URL}/api/bookings/${id}/feedback`, { rating, comment }, {
                 headers: { 'x-auth-token': token }
             });
             // Update local state to show feedback submitted or re-fetch
