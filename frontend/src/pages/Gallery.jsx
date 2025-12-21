@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 
 const Gallery = () => {
     const [images, setImages] = useState([]);
@@ -10,7 +11,7 @@ const Gallery = () => {
 
     const fetchImages = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/gallery');
+            const res = await axios.get(`${API_URL}/api/gallery`);
             setImages(res.data);
         } catch (err) {
             console.error(err);
@@ -24,7 +25,7 @@ const Gallery = () => {
                 {images.map((img) => (
                     <div key={img._id} className="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition">
                         <img
-                            src={`http://localhost:5000${img.imageUrl}`}
+                            src={`${API_URL}${img.imageUrl}`}
                             alt={img.title}
                             className="w-full h-64 object-cover"
                         />

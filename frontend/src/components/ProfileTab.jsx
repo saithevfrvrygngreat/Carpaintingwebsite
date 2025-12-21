@@ -144,7 +144,7 @@ const ProfileTab = ({ user, refreshUser }) => {
                                 {preview ? (
                                     <img src={preview} alt="Profile Preview" className="w-full h-full object-cover" />
                                 ) : user?.profileImage ? (
-                                    <img src={`http://localhost:5000${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
+                                    <img src={`${API_URL}${user.profileImage}`} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
                                     <span className="text-5xl font-bold text-primary">{formData.name ? formData.name.charAt(0).toUpperCase() : 'U'}</span>
                                 )}
