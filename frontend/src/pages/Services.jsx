@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { Wrench, ArrowRight, Star, Shield, Zap, Droplet, Loader } from 'lucide-react';
+import { Wrench, ArrowRight, Star, Shield, Zap, Droplet, Loader, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import API_URL from '../config';
 
 const carTypes = [
