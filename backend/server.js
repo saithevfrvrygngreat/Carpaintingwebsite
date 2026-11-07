@@ -38,9 +38,12 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }));
 
-// DEBUG: Request Logger
+// Request Logger (filters out frequent 5s dashboard polling)
 app.use((req, res, next) => {
-    console.log(`[DEBUG] ${req.method} ${req.originalUrl}`);
+    const isPolling = ['/api/all-bookings', '/api/contacts', '/api/auth/users'].includes(req.originalUrl);
+    if (!isPolling) {
+        console.log(`[HTTP] ${req.method} ${req.originalUrl}`);
+    }
     next();
 });
 
@@ -82,19 +85,6 @@ if (fs.existsSync(uploadDir)) {
 
 app.get('/', (req, res) => {
     res.send('Car Painting Service API Running');
-});
-
-// Diagnostic health check for Render & Vercel
-app.get('/api/health', (req, res) => {
-    const dbState = mongoose.connection.readyState;
-    const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
-    res.json({
-        status: dbState === 1 ? 'ok' : 'degraded',
-        database: states[dbState] || 'unknown',
-        databaseName: mongoose.connection.name || null,
-        mongoUriConfigured: Boolean(process.env.MONGO_URI),
-        serverTime: new Date().toISOString()
-    });
 });
 
 if (require.main === module) {
