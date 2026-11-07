@@ -5,9 +5,10 @@ import AuthContext from '../context/AuthContext';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
-import { LayoutDashboard, Users, ShoppingBag, Settings, LogOut, Search, Filter, Mail, User, DollarSign, Activity, Calendar, CheckCircle, Clock, XCircle, MoreVertical, Edit2, Play, Wrench, Star, MessageSquare, Loader } from 'lucide-react';
+import { LayoutDashboard, Users, ShoppingBag, Settings, LogOut, Search, Filter, Mail, User, DollarSign, Activity, Calendar, CheckCircle, Clock, XCircle, MoreVertical, Edit2, Play, Wrench, Star, MessageSquare, Loader, Trash2, AlertTriangle, X } from 'lucide-react';
 import API_URL from '../config';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 const AdminDashboard = () => {
     const { user, loading: authLoading } = useContext(AuthContext);
@@ -29,6 +30,31 @@ const AdminDashboard = () => {
     }, [user, authLoading, navigate]);
     const [statusUpdating, setStatusUpdating] = useState(null);
     const [sortOption, setSortOption] = useState('date'); // 'date' | 'status'
+    const [customerToDelete, setCustomerToDelete] = useState(null);
+    const [deletingUser, setDeletingUser] = useState(false);
+
+    const handleDeleteCustomer = async () => {
+        if (!customerToDelete) return;
+        try {
+            setDeletingUser(true);
+            const token = localStorage.getItem('token');
+            const config = { headers: { 'x-auth-token': token } };
+
+            await axios.delete(`${API_URL}/api/auth/users/${customerToDelete._id}`, config);
+
+            // Update UI immediately
+            setUsers(prev => prev.filter(u => u._id !== customerToDelete._id));
+            setBookings(prev => prev.filter(b => b.userId !== customerToDelete._id));
+
+            toast.success(`Customer "${customerToDelete.name}" removed successfully`);
+            setCustomerToDelete(null);
+        } catch (err) {
+            console.error("Failed to delete customer:", err);
+            toast.error(err.response?.data?.msg || "Failed to remove customer");
+        } finally {
+            setDeletingUser(false);
+        }
+    };
 
     useEffect(() => {
         fetchDashboardData();
@@ -412,7 +438,8 @@ const AdminDashboard = () => {
                                                 <th className="p-4 font-semibold">Contact</th>
                                                 <th className="p-4 font-semibold">Join Date</th>
                                                 <th className="p-4 font-semibold">Total Spent</th>
-                                                <th className="p-4 font-semibold text-right">Role</th>
+                                                <th className="p-4 font-semibold">Role</th>
+                                                <th className="p-4 font-semibold text-center">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-white/5">
@@ -434,14 +461,31 @@ const AdminDashboard = () => {
                                                         <td className="p-4 text-gray-400">{user.phone || 'N/A'}</td>
                                                         <td className="p-4 text-gray-400">{new Date(user.date || Date.now()).toLocaleDateString()}</td>
                                                         <td className="p-4 font-bold text-white">₹{spent.toLocaleString()}</td>
-                                                        <td className="p-4 text-right">
+                                                        <td className="p-4">
                                                             <span className="px-3 py-1 rounded-full text-xs font-bold border bg-gray-500/10 text-gray-400 border-gray-500/20">
                                                                 Customer
                                                             </span>
                                                         </td>
+                                                        <td className="p-4 text-center">
+                                                            <button
+                                                                onClick={() => setCustomerToDelete(user)}
+                                                                title={`Remove ${user.name}`}
+                                                                className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white transition-all border border-red-500/20 hover:border-red-600 flex items-center gap-1.5 mx-auto text-xs font-semibold group cursor-pointer shadow-sm"
+                                                            >
+                                                                <Trash2 size={14} className="group-hover:scale-110 transition-transform" />
+                                                                <span>Remove</span>
+                                                            </button>
+                                                        </td>
                                                     </tr>
                                                 );
                                             })}
+                                            {users.filter(u => u.role !== 'admin').length === 0 && (
+                                                <tr>
+                                                    <td colSpan="6" className="p-8 text-center text-gray-500">
+                                                        No customers found in database.
+                                                    </td>
+                                                </tr>
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -541,6 +585,88 @@ const AdminDashboard = () => {
                                 )}
                             </div>
                         </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Customer Removal Confirmation Modal */}
+                <AnimatePresence>
+                    {customerToDelete && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                className="bg-zinc-950 border border-red-500/30 rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-3 rounded-full bg-red-500/10 border border-red-500/30 text-red-500">
+                                            <AlertTriangle size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-bold text-white">Remove Customer</h3>
+                                            <p className="text-xs text-gray-400">Database deletion confirmation</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => !deletingUser && setCustomerToDelete(null)}
+                                        className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition"
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                </div>
+
+                                <p className="text-gray-300 text-sm mb-3">
+                                    Are you sure you want to permanently delete customer <span className="font-bold text-white">"{customerToDelete.name}"</span>?
+                                </p>
+
+                                <div className="bg-white/5 border border-white/10 rounded-xl p-3.5 mb-5 text-xs space-y-1.5 text-gray-300">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Email:</span>
+                                        <span className="font-mono text-white">{customerToDelete.email}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Contact:</span>
+                                        <span className="text-white">{customerToDelete.phone || 'N/A'}</span>
+                                    </div>
+                                    <div className="pt-2 border-t border-white/10 text-red-400 font-medium flex items-center gap-1.5">
+                                        <span>⚠️ All bookings associated with this customer will also be deleted.</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        disabled={deletingUser}
+                                        onClick={() => setCustomerToDelete(null)}
+                                        className="px-5 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/10 font-semibold text-sm transition disabled:opacity-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        disabled={deletingUser}
+                                        onClick={handleDeleteCustomer}
+                                        className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-900/40 transition flex items-center gap-2 disabled:opacity-50"
+                                    >
+                                        {deletingUser ? (
+                                            <>
+                                                <Loader size={16} className="animate-spin" />
+                                                <span>Deleting...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Trash2 size={16} />
+                                                <span>Yes, Delete</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
                     )}
                 </AnimatePresence>
             </div>

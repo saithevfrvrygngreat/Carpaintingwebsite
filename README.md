@@ -126,8 +126,8 @@ EMAIL_PASS=your_email_app_password
 Start the Backend Server:
 
 ```bash
-# Optional: Seed initial data (prices/services)
-node seed.js
+# Add or update service packages in the configured MongoDB database
+npm run seed:prices
 
 # Start the server
 node server.js

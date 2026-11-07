@@ -4,8 +4,9 @@ import AuthContext from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { User, Mail, Phone, Lock, Eye, EyeOff, Loader, Check, X } from 'lucide-react';
 
+
 const Register = () => {
-    const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '' });
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '',dateofbirth: '' });
     const [showPassword, setShowPassword] = useState(false);
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -162,6 +163,7 @@ const Register = () => {
                                 />
                             </div>
                         </div>
+                        
 
                         <div className="space-y-2">
                             <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold ml-1">Password</label>

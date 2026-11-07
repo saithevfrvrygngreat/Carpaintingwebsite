@@ -108,6 +108,40 @@ router.get('/users', async (req, res) => {
     }
 });
 
+// Delete User (Admin Only)
+router.delete('/users/:id', auth, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ msg: 'Not authorized as admin' });
+        }
+
+        const userToDelete = await User.findById(req.params.id);
+        if (!userToDelete) {
+            return res.status(404).json({ msg: 'Customer not found' });
+        }
+
+        if (userToDelete._id.toString() === req.user.id) {
+            return res.status(400).json({ msg: 'Cannot delete your own admin account' });
+        }
+
+        if (userToDelete.role === 'admin') {
+            return res.status(400).json({ msg: 'Cannot delete an admin account' });
+        }
+
+        // Delete any bookings belonging to this customer
+        const Booking = require('../models/Booking');
+        await Booking.deleteMany({ userId: userToDelete._id });
+
+        // Delete the customer
+        await User.findByIdAndDelete(req.params.id);
+
+        res.json({ msg: 'Customer and their booking history deleted successfully' });
+    } catch (err) {
+        console.error("Delete user error:", err.message);
+        res.status(500).json({ msg: 'Server Error', error: err.message });
+    }
+});
+
 // Verify Token & Get User (For AuthContext)
 router.get('/me', require('../middleware/auth'), async (req, res) => {
     try {

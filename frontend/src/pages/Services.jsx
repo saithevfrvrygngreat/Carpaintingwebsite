@@ -17,6 +17,7 @@ const Services = () => {
     const [prices, setPrices] = useState([]);
     const [selectedCarType, setSelectedCarType] = useState('Hatchback');
     const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     useEffect(() => {
         fetchPrices();
@@ -25,11 +26,19 @@ const Services = () => {
     const fetchPrices = async () => {
         try {
             setLoading(true);
+            setErrorMessage(null);
             const res = await axios.get(`${API_URL}/api/prices?carType=${selectedCarType}`);
-            setPrices(res.data);
+            if (Array.isArray(res.data)) {
+                setPrices(res.data);
+            } else {
+                setPrices([]);
+                setErrorMessage('Invalid data received from server.');
+            }
             setLoading(false);
         } catch (err) {
-            console.error(err);
+            console.error('Error fetching prices:', err);
+            setErrorMessage(err.response?.data?.error || err.message || 'Failed to connect to server');
+            setPrices([]);
             setLoading(false);
         }
     };
@@ -120,7 +129,20 @@ const Services = () => {
                             </motion.div>
                         ))}
 
-                        {prices.length === 0 && (
+                        {errorMessage && (
+                            <div className="col-span-full text-center py-12 glass-effect rounded-2xl border border-red-500/30 p-8">
+                                <p className="text-red-400 font-bold text-lg mb-2">Unable to load packages</p>
+                                <p className="text-gray-400 text-sm mb-6">{errorMessage} (Connecting to: {API_URL})</p>
+                                <button
+                                    onClick={fetchPrices}
+                                    className="px-6 py-2.5 bg-primary hover:bg-red-700 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(255,42,42,0.4)]"
+                                >
+                                    Try Again
+                                </button>
+                            </div>
+                        )}
+
+                        {!errorMessage && prices.length === 0 && (
                             <div className="col-span-full text-center py-20">
                                 <p className="text-gray-500 text-xl">No packages available for {selectedCarType} currently.</p>
                             </div>

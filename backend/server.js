@@ -9,8 +9,31 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+
+const allowedOrigins = [
+    "https://carpaintingwebsite-m4t6.vercel.app",
+    "https://car-painting-website-liard.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://localhost:3000"
+];
+
 app.use(cors({
-    origin: ["https://carpaintingwebsite-m4t6.vercel.app", "http://localhost:5173", "http://localhost:5000", "https://car-painting-website-liard.vercel.app"],
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps, curl, server-to-server)
+        if (!origin) return callback(null, true);
+        if (
+            allowedOrigins.includes(origin) ||
+            /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
+            /\.vercel\.app$/.test(origin)
+        ) {
+            return callback(null, true);
+        }
+        return callback(null, true); // Allow in dev to prevent blocking
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }));
@@ -26,7 +49,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/car-paintin
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-    .then(() => console.log('MongoDB Connected'))
+    .then(() => console.log(`MongoDB Connected to database: "${mongoose.connection.name}"`))
     .catch(err => console.log('DB Connection Error:', err));
 
 app.use('/api/auth', require('./routes/auth'));

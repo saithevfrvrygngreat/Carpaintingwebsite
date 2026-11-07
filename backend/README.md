@@ -62,8 +62,12 @@ EMAIL_PASS=your_app_specific_password
 ### 4. Database Seeding
 To populate the database with initial service prices:
 ```bash
-node seed.js
+npm run seed:prices
 ```
+
+This inserts or updates the Dent Removal, Full Paint, and Stickering packages
+for Hatchback, Sedan, SUV, and Luxury vehicles. It uses `MONGO_URI` from
+`backend/.env` and does not delete existing service prices.
 
 ### 5. Running the Server
 ```bash

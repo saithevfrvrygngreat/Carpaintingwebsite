@@ -40,10 +40,11 @@ const Booking = () => {
             }
             try {
                 const res = await axios.get(`${API_URL}/api/prices?carType=${formData.carType}`);
-                setAvailableServices(res.data);
+                const data = Array.isArray(res.data) ? res.data : [];
+                setAvailableServices(data);
 
                 if (formData.serviceType) {
-                    const matchingService = res.data.find(s => s.serviceName === formData.serviceType);
+                    const matchingService = data.find(s => s.serviceName === formData.serviceType);
                     if (matchingService) {
                         setFormData(prev => ({ ...prev, price: matchingService.price }));
                     } else {
@@ -53,6 +54,7 @@ const Booking = () => {
                 }
             } catch (err) {
                 console.error("Failed to fetch prices", err);
+                setAvailableServices([]);
             }
         };
 
@@ -209,21 +211,18 @@ const Booking = () => {
                                             className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition appearance-none"
                                             required
                                         >
-                                            <option value="" className="bg-gray-900">Select Service</option>
-                                            {availableServices.length > 0 ? (
-                                                availableServices.map((service) => (
-                                                    <option key={service._id} value={service.serviceName} className="bg-gray-900">
-                                                        {service.serviceName}
-                                                    </option>
-                                                ))
-                                            ) : (
-                                                <>
-                                                    <option value="Dent Removal" className="bg-gray-900">Dent Removal</option>
-                                                    <option value="Full Paint" className="bg-gray-900">Full Paint</option>
-                                                    <option value="Stickering" className="bg-gray-900">Stickering</option>
-                                                    <option value="Custom Mods" className="bg-gray-900">Custom Mods</option>
-                                                </>
-                                            )}
+                                            <option value="" className="bg-gray-900">
+                                                {!formData.carType
+                                                    ? 'Please select a Body Type first'
+                                                    : availableServices.length === 0
+                                                        ? 'No packages available for this vehicle type'
+                                                        : 'Select Service Package'}
+                                            </option>
+                                            {availableServices.map((service) => (
+                                                <option key={service._id} value={service.serviceName} className="bg-gray-900">
+                                                    {service.serviceName} (₹{service.price?.toLocaleString()})
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
